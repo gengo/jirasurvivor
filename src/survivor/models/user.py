@@ -15,16 +15,14 @@ class UserQuerySet(QuerySet):
 
 class User(Document):
     """
-    A GitHub collaborator.
+    A JIRA user.
     """
     meta = {'queryset_class': UserQuerySet}
 
-    github_id = IntField(required=True, unique=True)
-    login = StringField()
+    login = StringField(required=True, unique=True)
     name = StringField()
     email = StringField()
     avatar_url = StringField()
-    gravatar_id = StringField()
 
     def __init__(self, **kwargs):
         self._closed_issues = None

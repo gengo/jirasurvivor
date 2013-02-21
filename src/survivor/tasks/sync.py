@@ -1,95 +1,107 @@
 """
-Synchronises local database with GitHub.
+Synchronises local database with JIRA.
 """
 
 import argparse
 import itertools
 
-import github
+import jira-python
 
 from survivor import config, init
 from survivor.models import User, Issue
 
-def create_user(github_user):
-    "Creates a `survivor.models.User` from a `github.NamedUser`."
-    user = User(github_id=github_user.id)
-    for k in ('login', 'name', 'email', 'avatar_url', 'gravatar_id'):
-        setattr(user, k, getattr(github_user, k))
+# max number of issues to have jira return for the project
+MAX_ISSUE_RESULTS = 99999
+
+def create_user(jira_user):
+    "Creates a `survivor.models.User` from a `jira.resources.User`."
+    user = User(login=jira_user.name)
+    user.name = jira_user.displayName
+    user.email = jira_user.emailAddress
+    user.avatar_url = jira_user.avatarUrls.__dict__['48x48']
+
     return user.save()
 
-def get_or_create_user(github_user):
+def get_or_create_user(jira_user):
     """
     Get or create a `survivor.models.User` from a partially-loaded
-    `github.NamedUser`.
+    `jira.resources.User`.
     """
     try:
-        return User.objects.get(login=github_user.login)
+        return User.objects.get(login=jira_user.name)
     except User.DoesNotExist:
-        return create_user(github_user)
+        return create_user(jira_user)
 
-# Map primitive survivor.models.Issue attrs to github.Issue attrs
+# Map primitive survivor.models.Issue attrs to jira.resources.Issue attrs
 issue_attr_map = {
-    'number': 'number',
+    'key': 'key',
     'title': 'title',
-    'state': 'state',
-    'opened': 'created_at',
-    'closed': 'closed_at',
-    'updated': 'updated_at',
-    'url': 'html_url',
+    'state': 'fields.status.name',
+    'opened': 'created',
+    'closed': 'resolutiondate',
+    'updated': 'updated',
+    'url': 'self',
     }
 
-def create_issue(github_issue):
-    "Creates a `survivor.models.Issue` from a `github.Issue`."
-    issue = Issue(**dict((issue_attr, getattr(github_issue, github_attr))
-                         for issue_attr, github_attr in issue_attr_map.items()))
+def create_issue(jira_issue):
+    "Creates a `survivor.models.Issue` from a `jira.resources.Issue`."
+    issue = Issue(**dict((issue_attr, getattr(jira_issue, jira_attr))
+                         for issue_attr, jira_attr in issue_attr_map.items()))
 
-    issue.reporter = get_or_create_user(github_issue.user)
-    if github_issue.assignee:
-        issue.assignee = get_or_create_user(github_issue.assignee)
+    issue.reporter = get_or_create_user(jira_issue.fields.reporter)
+    if jira_issue.assignee:
+        issue.assignee = get_or_create_user(jira_issue.fields.assignee)
 
     # TODO comments, labels
 
     return issue.save()
 
 def sync(types, verbose=False):
-    "Refresh selected collections from GitHub."
+    "Refresh selected collections from JIRA."
 
-    auth_token = config['github.oauth_token']
-    account_name, repo_name = config['github.repo'].split('/')
+    jira_project = config['jira.project']
+    jira_username = config['jira.username']
+    jira_password = config['jira.password']
+    jira_server = config['jira.server']
 
-    account = github.Github(auth_token).get_user(account_name)
+    jira = JIRA(basic_auth=(jira_username, jira_password), options={'server': jira_server})
 
     if 'users' in types:
         User.drop_collection()
         # FIXME: can this come from config?
-        for github_user in account.get_repo(repo_name).get_collaborators():
+        for jira_user in jira.jira.search_assignable_users_for_projects('shawn.smith', 'GEN')
             try:
-                user = create_user(github_user)
+                user = create_user(jira_user)
             except:
-                print 'Error creating user: %s' % github_user
+                print 'Error creating user: %s' % jira_user.name
                 raise
-            if verbose: print 'created user: %s' % user.login
+            if verbose: print 'created user: %s' % jira_user.name
 
     if 'issues' in types:
         Issue.drop_collection()
-        repo = account.get_repo(repo_name)
+        """
         issues = itertools.chain(repo.get_issues(state='open'),
                                  repo.get_issues(state='closed'))
-        for gh_issue in issues:
+        """
+        issues = issues_in_proj(
+            jira.search_issues('project=%s and (status=OPEN or status=CLOSED)' % jira_project,
+                maxResults=MAX_ISSUE_RESULTS)
+        )
+        for jira_issue in issues:
             try:
-                issue = create_issue(gh_issue)
+                issue = create_issue(jira_issue)
             except:
-                print 'Error creating %s' % gh_issue
+                print 'Error creating %s' % jira_issue.key
                 raise
-            if verbose: print 'created issue: %s' % issue.title
+            if verbose: print 'created issue: %s' % jira_issue.key
 
 if __name__ == '__main__':
-    argparser = argparse.ArgumentParser(description='Synchronises local DB with GitHub')
+    argparser = argparse.ArgumentParser(description='Synchronises local DB with JIRA')
     argparser.add_argument('model', nargs='*', help='model types to sync')
     argparser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help='verbose output')
 
     args = argparser.parse_args()
     types = args.model or ('users', 'issues')
-    
+
     init()
     sync(types, args.verbose)

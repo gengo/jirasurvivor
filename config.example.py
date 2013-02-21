@@ -3,11 +3,14 @@
 
 config = {
     # Point this at the JIRA project you want to report on.
-    'jira.project': 'project-name',
+    'jira.project': 'project.name',
 
     # JIRA username and password
     'jira.username': 'my-username',
     'jira.password': 'my-secret',
+
+    # JIRA server
+    'jira.server': 'https://server.atlassian.net',
 
     # Your local Mongo database
     'db': 'jirasurvivor',

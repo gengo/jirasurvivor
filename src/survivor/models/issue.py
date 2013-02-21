@@ -31,11 +31,11 @@ class IssueQuerySet(QuerySet):
 
 class Issue(Document):
     """
-    A GitHub Issue
+    A JIRA Issue
     """
     meta = {'queryset_class': IssueQuerySet}
 
-    number = IntField(unique=True, required=True)
+    key = StringField(unique=True, required=True)
     title = StringField()
     state = StringField()
     assignee = ReferenceField(User, dbref=False)
