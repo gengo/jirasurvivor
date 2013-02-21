@@ -5,7 +5,7 @@ Synchronises local database with JIRA.
 import argparse
 import itertools
 
-import jira-python
+from jira.client import JIRA
 
 from survivor import config, init
 from survivor.models import User, Issue
