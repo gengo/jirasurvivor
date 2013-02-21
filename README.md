@@ -42,7 +42,7 @@ This command might satisfy the above dependencies on Ubuntu:
 
 ### Installation
 
-    $ git clone https://github.com/99designs/githubsurvivor.git /path/to/survivor
+    $ git clone https://github.com/gengo/jirasurvivor.git /path/to/survivor
     $ cd /path/to/survivor
     $ bin/setup
     $ $EDITOR config.py
