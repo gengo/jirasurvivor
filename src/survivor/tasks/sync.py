@@ -69,7 +69,7 @@ def sync(types, verbose=False):
     if 'users' in types:
         User.drop_collection()
         # FIXME: can this come from config?
-        for jira_user in jira.jira.search_assignable_users_for_projects('shawn.smith', 'GEN')
+        for jira_user in jira.jira.search_assignable_users_for_projects('shawn.smith', 'GEN'):
             try:
                 user = create_user(jira_user)
             except:
