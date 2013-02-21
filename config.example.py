@@ -2,15 +2,15 @@
 # Copy this to config.py and edit as required.
 
 config = {
-    # Point this at the repo you want to report on.
-    'github.repo': '99designs/githubsurvivor',
+    # Point this at the JIRA project you want to report on.
+    'jira.project': 'project-name',
 
-    # You'll need to create an OAuth token to access your repo.
-    # See https://help.github.com/articles/creating-an-oauth-token-for-command-line-use
-    'github.oauth_token': 'my-secret',
+    # JIRA username and password
+    'jira.username': 'my-username',
+    'jira.password': 'my-secret',
 
     # Your local Mongo database
-    'db': 'githubsurvivor',
+    'db': 'jirasurvivor',
 
     # You can optionally provide a whitelist of users to display in the bug
     # leaderboards. Leave this empty to include all repo contributors.
