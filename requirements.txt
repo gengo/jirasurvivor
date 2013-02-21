@@ -2,3 +2,4 @@ mongoengine==0.7.3
 Flask==0.9
 PyGithub==1.6
 python-dateutil==2.1
+jira-python
