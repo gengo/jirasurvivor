@@ -3,6 +3,7 @@ Synchronises local database with JIRA.
 """
 
 import argparse
+import iso8601
 import itertools
 
 from jira.client import JIRA
@@ -32,24 +33,21 @@ def get_or_create_user(jira_user):
     except User.DoesNotExist:
         return create_user(jira_user)
 
-# Map primitive survivor.models.Issue attrs to jira.resources.Issue attrs
-issue_attr_map = {
-    'key': 'key',
-    'title': 'title',
-    'state': 'fields.status.name',
-    'opened': 'created',
-    'closed': 'resolutiondate',
-    'updated': 'updated',
-    'url': 'self',
-    }
-
 def create_issue(jira_issue):
     "Creates a `survivor.models.Issue` from a `jira.resources.Issue`."
-    issue = Issue(**dict((issue_attr, getattr(jira_issue, jira_attr))
-                         for issue_attr, jira_attr in issue_attr_map.items()))
+    issue = Issue(key=jira_issue.key,
+                  title=jira_issue.fields.description,
+                  state=jira_issue.fields.status.name.lower(),
+                  opened=iso8601.parse_date(jira_issue.fields.created),
+                  updated=iso8601.parse_date(jira_issue.fields.updated),
+                  url=jira_issue.self)
 
     issue.reporter = get_or_create_user(jira_issue.fields.reporter)
-    if jira_issue.assignee:
+
+    if jira_issue.fields.resolutiondate:
+        issue.closed = iso8601.parse_date(jira_issue.fields.resolutiondate)
+
+    if jira_issue.fields.assignee:
         issue.assignee = get_or_create_user(jira_issue.fields.assignee)
 
     # TODO comments, labels
@@ -69,7 +67,7 @@ def sync(types, verbose=False):
     if 'users' in types:
         User.drop_collection()
         # FIXME: can this come from config?
-        for jira_user in jira.jira.search_assignable_users_for_projects('shawn.smith', 'GEN'):
+        for jira_user in jira.search_assignable_users_for_projects('', jira_project):
             try:
                 user = create_user(jira_user)
             except:
@@ -79,13 +77,9 @@ def sync(types, verbose=False):
 
     if 'issues' in types:
         Issue.drop_collection()
-        """
-        issues = itertools.chain(repo.get_issues(state='open'),
-                                 repo.get_issues(state='closed'))
-        """
-        issues = issues_in_proj(
-            jira.search_issues('project=%s and (status=OPEN or status=CLOSED)' % jira_project,
-                maxResults=MAX_ISSUE_RESULTS)
+        issues = jira.search_issues(
+            'project=%s and (status=OPEN or status=CLOSED)' % jira_project,
+            maxResults=MAX_ISSUE_RESULTS
         )
         for jira_issue in issues:
             try:
