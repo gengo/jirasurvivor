@@ -1,3 +1,5 @@
+from urllib2 import quote
+
 from mongoengine import *
 from mongoengine.queryset import QuerySet
 
@@ -48,5 +50,6 @@ class User(Document):
         return not whitelist or self.login in whitelist
 
     def assigned_issues_url(self):
-        return 'https://github.com/%s/issues/assigned/%s' % (config['github.repo'],
-                                                             self.login)
+        return quote('%s/issues/?jql=project = %s AND status = Open AND assignee = "%s"' % (config['jira.server'],
+                                                                                            config['jira.project'],
+                                                                                            self.login))
