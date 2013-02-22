@@ -20,7 +20,7 @@
 				<hr class="stripe gold" />
 				<img class="logo" src="/img/logo.png" />
 				<div class="info">
-					<span class="company">99designs</span>
+					<span class="company">99designs and Gengo</span>
 					<span class="date">{{ today | format_datetime('%a.%d%m%y') }}</span>
 				</div>
 			</div>
@@ -33,7 +33,7 @@
 			<ol>
 				{% for member, count in members %}
 				<li>
-					<img class="avatar" src="//www.gravatar.com/avatar/{{ member.gravatar_id }}?s=52" />
+					<img class="avatar" src="{{ member.avatar_url }}" />
 					<span class="name">{{ member.login }}</span>
 					<span class="count">{{ count }}</span>
 				</li>
@@ -44,10 +44,10 @@
 
 		<div id="leaderboards" class="row-fluid">
 			<div class="span6">
-				{{ leaderboard('top-closers', 'Hall of Fame', ranked[-5:] | reverse) }}
+				{{ leaderboard('top-closers', 'Hall of Fame', ranked[-10:] | reverse) }}
 			</div>
 			<div class="span6">
-				{{ leaderboard('worst-closers', 'Hall of Shame', ranked[:5]) }}
+				{{ leaderboard('worst-closers', 'Hall of Shame', ranked[:10]) }}
 			</div>
 		</div>
 
@@ -112,7 +112,7 @@
 		</div>
 
 		<div id="footer" class="row-fluid">
-			GitHub Survivor TM & Copyright 1987 99designs dev team
+			JIRA Survivor TM & Copyright 1987 99designs and Gengo dev teams
 			<span class="start">&lt;Insert coin to begin playing&gt;</span>
 		</div>
 
