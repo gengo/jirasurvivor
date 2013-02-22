@@ -50,6 +50,6 @@ class User(Document):
         return not whitelist or self.login in whitelist
 
     def assigned_issues_url(self):
-        return quote('%s/issues/?jql=project = %s AND status = Open AND assignee = "%s"' % (config['jira.server'],
-                                                                                            config['jira.project'],
-                                                                                            self.login))
+        return '%s/issues/?jql=' % config['jira.server'] + \
+            quote('project = %s AND status = Open AND assignee = "%s"' % (config['jira.project'],
+                                                                          self.login))
