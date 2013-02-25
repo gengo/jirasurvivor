@@ -44,10 +44,10 @@
 
 		<div id="leaderboards" class="row-fluid">
 			<div class="span6">
-				{{ leaderboard('top-closers', 'Hall of Fame', ranked[-10:] | reverse) }}
+				{{ leaderboard('top-closers', 'Hall of Fame', ranked[-5:] | reverse) }}
 			</div>
 			<div class="span6">
-				{{ leaderboard('worst-closers', 'Hall of Shame', ranked[:10]) }}
+				{{ leaderboard('worst-closers', 'Hall of Shame', ranked[:5]) }}
 			</div>
 		</div>
 
