@@ -140,12 +140,12 @@ survivor.dashboard = (function () {
     $(function () {
         initBugRateChart({
             dataTable: $('#bug-rate-data'),
-		    colours: ['#E63A16', '#153B5F']
+		    colours: ['#1CAD7E', '#0B4532']
 		});
 
 	    initBugCountChart({
             dataTable: $('#open-bug-data'),
-		    colours: { line: '#E63A16', area: '#5F1A0A' }
+		    colours: { line: '#9EC6A3', area: '#00815A' }
 		});
 
         // Refresh every 10 minutes to get latest data
