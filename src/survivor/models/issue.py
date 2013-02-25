@@ -44,3 +44,4 @@ class Issue(Document):
     opened = DateTimeField(required=True)
     updated = DateTimeField(required=True)
     url = URLField()
+    finished_or_fixed = BooleanField()
