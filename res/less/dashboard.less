@@ -185,12 +185,11 @@ body {
     margin: 0;
     padding-left: 110px;
     font-size: 70px;
-    color: #5E1A0F;
     background-position: left 50;
     background-repeat: no-repeat;
 
-    &.pos { background-image: url('/img/arrow-up.png'); }
-    &.neg { background-image: url('/img/arrow-down.png'); }
+    &.pos { background-image: url('/img/arrow-up.png'); color: @delta-bad-colour}
+    &.neg { background-image: url('/img/arrow-down.png'); color: @delta-good-colour}
   }
 }
 
