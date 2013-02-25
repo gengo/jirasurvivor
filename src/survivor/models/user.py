@@ -34,7 +34,8 @@ class User(Document):
         return self.issues('open')
 
     def closed_issues(self):
-        return self.issues('closed')
+        from survivor.models.issue import Issue
+        return Issue.objects(assignee=self, state="closed", finished_or_fixed=True)
 
     def reported_issues(self):
         from survivor.models.issue import Issue
