@@ -45,7 +45,9 @@ def create_issue(jira_issue):
     issue.reporter = get_or_create_user(jira_issue.fields.reporter)
 
     if jira_issue.fields.resolutiondate:
-        issue.closed = iso8601.parse_date(jira_issue.fields.resolutiondate)
+        resolution_type = jira_issue.fields.resolution.name
+        if resolution_type == "Finished" or resolution_type == "Fixed":
+            issue.closed = iso8601.parse_date(jira_issue.fields.resolutiondate)
 
     if jira_issue.fields.assignee:
         issue.assignee = get_or_create_user(jira_issue.fields.assignee)
