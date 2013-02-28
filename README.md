@@ -3,7 +3,7 @@
 JIRA Survivor is a simple bug dashboard that shows an overview of bugs in a
 JIRA project. Based on [GitHub Survivor][1] by 99designs. 
 
-![Screenshot](https://github.com/99designs/githubsurvivor/wiki/screenshot.png)
+![Screenshot](https://github.com/gengo/jirasurvivor/wiki/screenshot.png)
 
 ## Overview
 
