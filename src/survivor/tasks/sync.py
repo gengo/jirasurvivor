@@ -42,7 +42,10 @@ def create_issue(jira_issue):
                   updated=iso8601.parse_date(jira_issue.fields.updated),
                   url=jira_issue.self)
 
-    issue.reporter = get_or_create_user(jira_issue.fields.reporter)
+    if jira_issue.fields.reporter is not None:
+        issue.reporter = get_or_create_user(jira_issue.fields.reporter)
+    else:
+        issue.reporter = get_or_create_user(jira_issue.fields.assignee)
 
     if jira_issue.fields.resolutiondate:
         issue.closed = iso8601.parse_date(jira_issue.fields.resolutiondate)
