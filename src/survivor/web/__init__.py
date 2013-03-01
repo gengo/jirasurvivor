@@ -39,6 +39,8 @@ def reporting_period(unit, anchor, offset=0):
 def dashboard():
     today = timeutils.today()
 
+    project = config['jira.project']
+
     reporting_unit = request_arg('reporting_unit', default=config['reporting.window'])
     previous_periods = int(request_arg('previous_periods', default=12))
 
@@ -79,6 +81,7 @@ def dashboard():
     return render_template('dashboard.jinja2',
                            # Context vars
                            today=today,
+                           project=project,
                            period_label=reporting_unit,
                            ranked=ranked,
                            opened_closed_bugs=opened_closed_bugs,
